@@ -204,7 +204,7 @@ void MainWindow::createToolButtons()
 void MainWindow::addCharacters()
 {
     bool ok = true;
-    int newchars = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, QLineEdit::Normal);
+    int newchars = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, 0, INT_MAX, 1, &ok);
 
     assert(dataModel->columnCount() != 0);
     dataModel->insertColumns(dataModel->columnCount()-1, newchars);  // TODO: REPLACE WITH AN NTAX GETTER!!!
@@ -214,7 +214,7 @@ void MainWindow::addCharacters()
 void MainWindow::addTaxa()
 {
     bool ok = true;
-    int newtaxa = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 1, QLineEdit::Normal);
+    int newtaxa = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 1, 0, INT_MAX, 1, &ok);
 
     assert(dataModel->rowCount() != 0);
     dataModel->insertRows(dataModel->rowCount(), newtaxa);  // TODO: REPLACE WITH AN NCHAR GETTER!!!
@@ -444,23 +444,24 @@ void MainWindow::fileNew()
         return;
     }
 
-    int taxcount = 1;
-    int charcount = 1;
+    unsigned int taxcount = 1;
+    unsigned int charcount = 1;
 
-    taxcount = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 1, QLineEdit::Normal);
-    charcount = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 3, QLineEdit::Normal);
+    bool ok = false;
+    taxcount = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 3, 0, INT_MAX, 1, &ok);
+    charcount = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, 0, INT_MAX, 1, &ok);
 
     launchTableDisplay();
 
     dataModel->setDimensions(taxcount, charcount);
     dataModel->setHeaderData(0, Qt::Horizontal, QObject::tr("Taxon"));
 
-    for (unsigned int i = 0; i < 3; ++i ) {
+    for (unsigned int i = 0; i < taxcount; ++i ) {
 
         QModelIndex index = dataModel->index(i, 0, QModelIndex());
         dataModel->setData(index,  QString("Taxon_%1").arg(i+1));
 
-        for (unsigned int j = 1; j < 2; ++j) {
+        for (unsigned int j = 1; j < charcount; ++j) {
             QModelIndex index = dataModel->index(i, j, QModelIndex());
             dataModel->setData(index, QString("?"));
         }

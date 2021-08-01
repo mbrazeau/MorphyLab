@@ -10,6 +10,7 @@ SOURCES += \
     MainLayout.cpp \
     MainWindow.cpp \
     MorphyLabNexusReader.cpp \
+    StateDataTable.cpp \
     abstractphydata.cpp \
     chardata.cpp \
     charinfodialog.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     MainLayout.h \
     MainWindow.h \
     MorphyLabNexusReader.h \
+    StateDataTable.h \
     abstractphydata.h \
     chardata.h \
     charinfodialog.h \

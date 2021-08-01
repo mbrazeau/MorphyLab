@@ -23,7 +23,6 @@ void MorphyLabNexusReader::openNexusFile(char *arg)
     if (hasDataBlock()) {
         _datab->TransferTo(*_characters);
     }
-
 }
 
 void MorphyLabNexusReader::closeNexusFile()

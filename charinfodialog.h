@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QLayout>
 
+
+
 class ToolButton;
 class CharInfoDialog : public QDialog
 {
