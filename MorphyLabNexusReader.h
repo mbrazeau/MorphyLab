@@ -26,6 +26,8 @@ private:
     NxsAssumptionsBlock *_assumptions;
     NxsCharactersBlock  *_characters;
     NxsDataBlock        *_datab;
+
+    bool hasDataBlock();
 };
 
 #endif // MORPHYLABNEXUSREADER_H

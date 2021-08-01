@@ -7,20 +7,23 @@ MorphyLabNexusReader::MorphyLabNexusReader()
     _taxa           = new NxsTaxaBlock();
     _assumptions    = new NxsAssumptionsBlock(_taxa);
     _characters     = new NxsCharactersBlock(_taxa, _assumptions);
+    _datab          = new NxsDataBlock(_taxa, _assumptions);
 
 //    // Add the blocks to the reader stack
     _reader->Add(_taxa);
     _reader->Add(_assumptions);
     _reader->Add(_characters);
+    _reader->Add(_datab);
 }
 
 void MorphyLabNexusReader::openNexusFile(char *arg)
 {
     _reader->ReadFilepath(arg, MultiFormatReader::NEXUS_FORMAT);
 
-    // TODO: Then read in all the stuff
-    // Get the dimensions; set the table dimensions and all that.
-    // Probably best to put this in its own functions.
+    if (hasDataBlock()) {
+        _datab->TransferTo(*_characters);
+    }
+
 }
 
 void MorphyLabNexusReader::closeNexusFile()
@@ -53,6 +56,20 @@ QString MorphyLabNexusReader::getTaxLabel(unsigned int i)
     QString *ret = new QString(nxTaxlabel.c_str());
 
     return *ret;
+}
+
+bool MorphyLabNexusReader::hasDataBlock()
+{
+    BlockReaderList b1 = _reader->GetUsedBlocksInOrder();
+    for (std::list<NxsBlock *>::iterator i = b1.begin(); i != b1.end(); ++i)
+    {
+        NxsBlock * b = (*i);
+        if (b->GetID().compare("DATA") == 0)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 QString MorphyLabNexusReader::getCellData(unsigned int tax_i, unsigned int char_i)

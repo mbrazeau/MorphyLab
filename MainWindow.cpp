@@ -482,8 +482,8 @@ void MainWindow::fileExport()
 void MainWindow::aboutMenu()
 {
     QString about =
-
-    "This program is written by Martin D. Brazeau."
+    "MorphyLab version 0.1 alpha"
+    "written by Martin D. Brazeau."
     "\n\n"
     "This program uses the Nexus Class Library by Mark Holder and Paul O. Lewis.";
 
