@@ -179,25 +179,25 @@ void MainWindow::createToolButtons()
 
     taxonButtonLayout->addWidget(bNewChar);
     connect(bNewChar, &QPushButton::clicked, this, &MainWindow::addCharacters);
-    bNewChar->setIcon(QIcon("/resources/add-col.png"));
+    bNewChar->setIcon(QIcon(":/resources/icons/add-col.png"));
     bNewChar->setToolTip(tr("Add characters"));
 
     taxonButtonLayout->addWidget(bNewTax);
     connect(bNewTax, &QPushButton::clicked, this, &MainWindow::addTaxa);
-    bNewTax->setIcon(QIcon("/resources/add-row.png"));
+    bNewTax->setIcon(QIcon(":/resources/icons/add-row.png"));
     bNewTax->setToolTip("Add taxa");
 
     taxonButtonLayout->addWidget(bDelete);
 //    connect(bNewTax, &QPushButton::clicked, this, &MainWindow::doDeletion);
-    bDelete->setIcon(QIcon("/resources/delete.png"));
+    bDelete->setIcon(QIcon(":/resources/icons/delete.png"));
     bDelete->setToolTip("Delete selection");
 
     taxonButtonLayout->addWidget(bMerge);
-    bMerge->setIcon(QIcon("/resources/merge.png"));
+    bMerge->setIcon(QIcon(":/resources/icons/merge.png"));
     taxonButtonLayout->addWidget(bDiff);
-    bDiff->setIcon(QIcon("/resources/compare.png"));
+    bDiff->setIcon(QIcon(":/resources/icons/compare.png"));
     taxonButtonLayout->addWidget(bInfo);
-    bInfo->setIcon(QIcon("/resources/info.png"));
+    bInfo->setIcon(QIcon(":/resources/icons/info.png"));
     taxonButtonLayout->addStretch();
 }
 

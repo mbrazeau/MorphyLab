@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>icons/add-col.png</file>
+        <file>icons/add-row.png</file>
+        <file>icons/compare.png</file>
+        <file>icons/delete.png</file>
+        <file>icons/info.png</file>
+        <file>icons/merge.png</file>
+    </qresource>
+</RCC>
