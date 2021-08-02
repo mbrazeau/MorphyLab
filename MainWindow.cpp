@@ -333,7 +333,7 @@ void MainWindow::fileOpen()
     // Alternatively: deactivate ("ghost") File > Open... when a file is already open
 
     if (dataModel) {
-        showMessage(tr("A ddataset is already open. To open another one, save and close the current file"));
+        showMessage(tr("A dataset is already open. To open another one, save and close the current file"));
         return;
     }
 
@@ -349,7 +349,12 @@ void MainWindow::fileOpen()
 
     launchTableDisplay();
 
-    reader->openNexusFile(cfilename);
+    try {
+        reader->openNexusFile(cfilename);
+    } catch (NxsException &e) {
+        showMessage(QString::fromStdString(e.what()));
+        return;
+    }
 
     dataModel->setDimensions(reader->getNtax(), reader->getNchar());
 
