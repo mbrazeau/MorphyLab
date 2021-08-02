@@ -347,14 +347,14 @@ void MainWindow::fileOpen()
     QByteArray qbfilename = filename.toLocal8Bit();
     char* cfilename = qbfilename.data();
 
-    launchTableDisplay();
-
     try {
         reader->openNexusFile(cfilename);
     } catch (NxsException &e) {
         showMessage(QString::fromStdString(e.what()));
         return;
     }
+
+    launchTableDisplay();
 
     dataModel->setDimensions(reader->getNtax(), reader->getNchar());
 
