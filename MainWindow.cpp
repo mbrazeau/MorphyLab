@@ -179,25 +179,25 @@ void MainWindow::createToolButtons()
 
     taxonButtonLayout->addWidget(bNewChar);
     connect(bNewChar, &QPushButton::clicked, this, &MainWindow::addCharacters);
-    bNewChar->setIcon(QIcon("/Users/mbrazeau/Code/MorphyLab/support/add-col.png"));
+    bNewChar->setIcon(QIcon("/resources/add-col.png"));
     bNewChar->setToolTip(tr("Add characters"));
 
     taxonButtonLayout->addWidget(bNewTax);
     connect(bNewTax, &QPushButton::clicked, this, &MainWindow::addTaxa);
-    bNewTax->setIcon(QIcon("/Users/mbrazeau/Code/MorphyLab/support/add-row.png"));
+    bNewTax->setIcon(QIcon("/resources/add-row.png"));
     bNewTax->setToolTip("Add taxa");
 
     taxonButtonLayout->addWidget(bDelete);
 //    connect(bNewTax, &QPushButton::clicked, this, &MainWindow::doDeletion);
-    bDelete->setIcon(QIcon("/Users/mbrazeau/Code/MorphyLab/support/delete.png"));
+    bDelete->setIcon(QIcon("/resources/delete.png"));
     bDelete->setToolTip("Delete selection");
 
     taxonButtonLayout->addWidget(bMerge);
-    bMerge->setIcon(QIcon("/Users/mbrazeau/Code/MorphyLab/support/merge.png"));
+    bMerge->setIcon(QIcon("/resources/merge.png"));
     taxonButtonLayout->addWidget(bDiff);
-    bDiff->setIcon(QIcon("/Users/mbrazeau/Code/MorphyLab/support/compare.png"));
+    bDiff->setIcon(QIcon("/resources/compare.png"));
     taxonButtonLayout->addWidget(bInfo);
-    bInfo->setIcon(QIcon("/Users/mbrazeau/Code/MorphyLab/support/info.png"));
+    bInfo->setIcon(QIcon("/resources/info.png"));
     taxonButtonLayout->addStretch();
 }
 
