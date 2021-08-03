@@ -30,6 +30,7 @@ private:
 
     void createMenus();
     void createMainWindow();
+    void setButtonsDisabled(bool d);
     void createToolButtons();
 
     void addCharacters();
@@ -41,12 +42,23 @@ private:
     void fileNew();
     void fileImport();
     void fileExport();
+    void fileClose();
     void aboutMenu();
 
+    void createDataTables();
     void initDataTableDisplay();
     void launchTableDisplay();
+    void closeDisplay();
 
     void showMessage(QString message);
+
+    // Tool buttons
+    ToolButton *bNewChar;
+    ToolButton *bNewTax;
+    ToolButton *bDelete;
+    ToolButton *bMerge;
+    ToolButton *bDiff;
+    ToolButton *bInfo;
 
     QWidget *mainWidget;
 

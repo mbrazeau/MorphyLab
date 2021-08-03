@@ -44,7 +44,7 @@ MainWindow::MainWindow() : QMainWindow()
     createMenus();
     setWindowTitle("MorphyLab");
 
-//    createMainWindow();
+    createMainWindow();
 }
 
 void MainWindow::createMenus()
@@ -68,6 +68,10 @@ void MainWindow::createMenus()
     fileMenu->addAction(saveAct);
     saveAct->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
     connect(saveAct, &QAction::triggered, this, &MainWindow::save);
+
+    QAction *closeAct = new QAction(tr("&Close..."), this);
+    fileMenu->addAction(closeAct);
+    connect(closeAct, &QAction::triggered, this, &MainWindow::fileClose);
 
     QAction *importAct = new QAction(tr("&Import..."), this);
     fileMenu->addAction(importAct);
@@ -114,65 +118,35 @@ void MainWindow::createMenus()
     connect(aboutAction, &QAction::triggered, this, &MainWindow::aboutMenu);
 }
 
-//void MainWindow::createLayout()
-//{
-
-//    matrixAreaSplitter = new QSplitter;
-
-//    mlay = new MainLayout;
-
-//    dataModel = new PhyDataTableModel;//(this);
-//    dataTable = new QTableView;//(this);
-//    taxonColumn = new QTableView;//(this);
-
-//    matrixAreaSplitter->addWidget(taxonColumn);
-//    matrixAreaSplitter->addWidget(dataTable);
-
-////    taxonColumn->setModel(dataModel);
-
-//    mlay->addWidget(matrixAreaSplitter, MainLayout::Centre);
-
-//    bNew    = new ToolButton("New");
-//    bSplit  = new ToolButton("Split");
-//    bMerge  = new ToolButton("Merge");
-//    bDiff   = new ToolButton("Diff");
-//    bInfo   = new ToolButton("Info");
-
-//    mlay->addWidget(bNew, MainLayout::Left);
-//    mlay->addWidget(bSplit, MainLayout::Left);
-//    mlay->addWidget(bMerge, MainLayout::Left);
-//    mlay->addWidget(bDiff, MainLayout::Left);
-//    mlay->addWidget(bInfo, MainLayout::Left);
-////    mlay->addStretch();
-
-//    mainWidget->setLayout(mlay);
-//}
-
 void MainWindow::createMainWindow()
 {
     mainLayout = new QHBoxLayout(mainWidget);
     taxonButtonLayout = new QVBoxLayout;
 
     createToolButtons();
+    setButtonsDisabled(true);
 
     createTableViews();
 
     mainWidget->setLayout(mainLayout);
 }
 
+void MainWindow::setButtonsDisabled(bool d)
+{
+    bNewChar->setDisabled(d);
+    bNewTax->setDisabled(d);
+    bDelete->setDisabled(d);
+    bMerge->setDisabled(d);
+    bDiff->setDisabled(d);
+    bInfo->setDisabled(d);
+}
+
 void MainWindow::createToolButtons()
 {
     // Create the buttons
-    ToolButton *bNewChar;
-    ToolButton *bNewTax;
-    ToolButton *bDelete;
-    ToolButton *bMerge;
-    ToolButton *bDiff;
-    ToolButton *bInfo;
-
     bNewChar    = new ToolButton(this);
     bNewTax     = new ToolButton(this);
-    bDelete      = new ToolButton(this);
+    bDelete     = new ToolButton(this);
     bMerge      = new ToolButton(this);
     bDiff       = new ToolButton(this);
     bInfo       = new ToolButton(this);
@@ -204,17 +178,23 @@ void MainWindow::createToolButtons()
 void MainWindow::addCharacters()
 {
     bool ok = true;
-    int newchars = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, 0, INT_MAX, 1, &ok);
+    int newchars = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, 1, INT_MAX, 1, &ok);
+    if (!ok) {
+        return;
+    }
 
     assert(dataModel->columnCount() != 0);
-    dataModel->insertColumns(dataModel->columnCount()-1, newchars);  // TODO: REPLACE WITH AN NTAX GETTER!!!
+    dataModel->insertColumns(dataModel->columnCount(), newchars);  // TODO: REPLACE WITH AN NTAX GETTER!!!
     initDataTableDisplay();
 }
 
 void MainWindow::addTaxa()
 {
     bool ok = true;
-    int newtaxa = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 1, 0, INT_MAX, 1, &ok);
+    int newtaxa = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 1, 1, INT_MAX, 1, &ok);
+    if (!ok) {
+        return;
+    }
 
     assert(dataModel->rowCount() != 0);
     dataModel->insertRows(dataModel->rowCount(), newtaxa);  // TODO: REPLACE WITH AN NCHAR GETTER!!!
@@ -229,101 +209,8 @@ void MainWindow::createTableViews()
 
     matrixAreaSplitter->setHandleWidth(1);
 
-    // Create the tables: one for taxa only and one for matrix cells
-    dataModel = new PhyDataTableModel(this);
-
-    dataTable = new QTableView(this);
-    dataTable2 = new QTableView(this);
-    taxonColumn = new QTableView(this);
-
-    dataTable->setModel(dataModel);
-    dataTable2->setModel(dataModel);
-    taxonColumn->setModel(dataModel);
-
-    dataTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-    dataTable->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
-    dataTable2->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
-    dataTable2->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
-    taxonColumn->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
-
-    // C'nect the scroll bars.
-    connect(dataTable->verticalScrollBar(), &QAbstractSlider::valueChanged,
-            dataTable2->verticalScrollBar(), &QAbstractSlider::setValue);
-    connect(dataTable2->verticalScrollBar(), &QAbstractSlider::valueChanged,
-            taxonColumn->verticalScrollBar(), &QAbstractSlider::setValue);
-    connect(taxonColumn->verticalScrollBar(), &QAbstractSlider::valueChanged,
-            dataTable->verticalScrollBar(), &QAbstractSlider::setValue);
-
-    // TODO: This is working poorly and needs fixing
-    // This part controls the propagation of selections from one table to all others
-    /*
-     * Review QItemSelectionModel Class
-     * Review QTableView::setSelectionModel
-    */
-    QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentRowChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                dataTable->clearSelection();
-                dataTable2->clearSelection();
-                dataTable->selectRow(current.row());
-                dataTable2->selectRow(current.row());
-            }
-        });
-    QObject::connect(dataTable->selectionModel(), &QItemSelectionModel::currentColumnChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                taxonColumn->clearSelection();
-                dataTable2->clearSelection();
-                dataTable2->selectColumn(current.column());
-            }
-        });
-
-    QObject::connect(dataTable2->selectionModel(), &QItemSelectionModel::currentColumnChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                dataTable->clearSelection();
-                taxonColumn->clearSelection();
-                dataTable->selectColumn(current.column());
-            }
-        });
-
-    QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentColumnChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                dataTable->clearSelection();
-                dataTable2->clearSelection();
-            }
-        });
-
-    dataTable->horizontalHeader()->setSectionsMovable(true);
-    dataTable->horizontalHeader()->setDragEnabled(true);
-    dataTable->setDragDropMode(QAbstractItemView::InternalMove);
-
-    taxonColumn->verticalHeader()->setSectionsMovable(true);
-    taxonColumn->verticalHeader()->setDragEnabled(true);
-    taxonColumn->setDragDropMode(QAbstractItemView::InternalMove);
-
     mainLayout->addLayout(taxonButtonLayout);
-    matrixAreaSplitter->addWidget(taxonColumn);
-    matrixAreaSplitter->addWidget(dataTable);
-    matrixAreaSplitter->addWidget(dataTable2);
-
     mainLayout->addWidget(matrixAreaSplitter);
-
-    //
-    dataTable->verticalHeader()->hide();
-    dataTable2->verticalHeader()->hide();
-    dataTable->hideColumn(0);
-    dataTable2->hideColumn(0);
-    taxonColumn->setMaximumWidth(taxonColumn->columnWidth(0));
-
-    taxonColumn->setStyleSheet(styleSheet);
-    dataTable->setStyleSheet(styleSheet);
-    dataTable2->setStyleSheet(styleSheet);
 }
 
 
@@ -354,6 +241,7 @@ void MainWindow::fileOpen()
         return;
     }
 
+    createDataTables();
     launchTableDisplay();
 
     dataModel->setDimensions(reader->getNtax(), reader->getNchar());
@@ -453,9 +341,19 @@ void MainWindow::fileNew()
     unsigned int charcount = 1;
 
     bool ok = false;
-    taxcount = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 3, 0, INT_MAX, 1, &ok);
-    charcount = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, 0, INT_MAX, 1, &ok);
+    taxcount = QInputDialog::getInt(this, tr("Add taxon rows"), tr("Enter a number of taxa"), 3, 1, INT_MAX, 1, &ok);
+    if (!ok) {
+        showMessage(tr("You must enter a valid number of taxa"));
+        return;
+    }
+    charcount = QInputDialog::getInt(this, tr("Add character columns"), tr("Enter a number of characters"), 1, 1, INT_MAX, 1, &ok);
+    if (!ok) {
+        charcount = 0;
+        showMessage(tr("No characters added"));
+//        return;
+    }
 
+    createDataTables();
     launchTableDisplay();
 
     dataModel->setDimensions(taxcount, charcount);
@@ -485,15 +383,138 @@ void MainWindow::fileExport()
     showMessage("Feature not yet implemented.");
 }
 
+void MainWindow::fileClose()
+{
+    QMessageBox msg;
+    msg.setText(tr("Save changes?"));
+    msg.setInformativeText(tr("Would you like to save any changes?"));
+    msg.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msg.setDefaultButton(QMessageBox::Save);
+    int ret = msg.exec();
+
+    switch (ret) {
+      case QMessageBox::Save:
+          save();
+          break;
+      case QMessageBox::Cancel:
+          return;
+      case QMessageBox::Discard:
+          break;
+      default:
+          // should never be reached
+          break;
+    }
+
+    closeDisplay();
+}
+
 void MainWindow::aboutMenu()
 {
     QString about =
-    "MorphyLab version 0.2 alpha"
+    "MorphyLab version 0.2 alpha\n"
     "written by Martin D. Brazeau."
     "\n\n"
-    "This program uses the Nexus Class Library by Mark Holder and Paul O. Lewis.";
+    "This program uses the Nexus Class Library by Mark Holder and Paul O. Lewis.\n\n"
+    "Thanks:\n"
+    "Joe Keating, Sam Giles, and Luke Parry for being early testers."
+    ;
 
     showMessage(about);
+}
+
+void MainWindow::createDataTables()
+{
+    // Create the tables: one for taxa only and one for matrix cells
+    dataModel = new PhyDataTableModel(this);
+
+    dataTable = new QTableView(this);
+    dataTable2 = new QTableView(this);
+    taxonColumn = new QTableView(this);
+
+    dataTable->setModel(dataModel);
+    dataTable2->setModel(dataModel);
+    taxonColumn->setModel(dataModel);
+
+    dataTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    dataTable->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
+    dataTable2->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
+    dataTable2->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
+    taxonColumn->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
+
+    // C'nect the scroll bars.
+    connect(dataTable->verticalScrollBar(), &QAbstractSlider::valueChanged,
+            dataTable2->verticalScrollBar(), &QAbstractSlider::setValue);
+    connect(dataTable2->verticalScrollBar(), &QAbstractSlider::valueChanged,
+            taxonColumn->verticalScrollBar(), &QAbstractSlider::setValue);
+    connect(taxonColumn->verticalScrollBar(), &QAbstractSlider::valueChanged,
+            dataTable->verticalScrollBar(), &QAbstractSlider::setValue);
+
+    // TODO: This is working poorly and needs fixing
+    // This part controls the propagation of selections from one table to all others
+    /*
+     * Review QItemSelectionModel Class
+     * Review QTableView::setSelectionModel
+    */
+    QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentRowChanged,
+                         [this](const QModelIndex &current, const QModelIndex & previous)
+        {
+            if(previous.isValid()) {
+                dataTable->clearSelection();
+                dataTable2->clearSelection();
+                dataTable->selectRow(current.row());
+                dataTable2->selectRow(current.row());
+            }
+        });
+    QObject::connect(dataTable->selectionModel(), &QItemSelectionModel::currentColumnChanged,
+                         [this](const QModelIndex &current, const QModelIndex & previous)
+        {
+            if(previous.isValid()) {
+                taxonColumn->clearSelection();
+                dataTable2->clearSelection();
+                dataTable2->selectColumn(current.column());
+            }
+        });
+
+    QObject::connect(dataTable2->selectionModel(), &QItemSelectionModel::currentColumnChanged,
+                         [this](const QModelIndex &current, const QModelIndex & previous)
+        {
+            if(previous.isValid()) {
+                dataTable->clearSelection();
+                taxonColumn->clearSelection();
+                dataTable->selectColumn(current.column());
+            }
+        });
+
+    QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentColumnChanged,
+                         [this](const QModelIndex &current, const QModelIndex & previous)
+        {
+            if(previous.isValid()) {
+                dataTable->clearSelection();
+                dataTable2->clearSelection();
+            }
+        });
+
+    dataTable->horizontalHeader()->setSectionsMovable(true);
+    dataTable->horizontalHeader()->setDragEnabled(true);
+    dataTable->setDragDropMode(QAbstractItemView::InternalMove);
+
+    taxonColumn->verticalHeader()->setSectionsMovable(true);
+    taxonColumn->verticalHeader()->setDragEnabled(true);
+    taxonColumn->setDragDropMode(QAbstractItemView::InternalMove);
+
+    matrixAreaSplitter->addWidget(taxonColumn);
+    matrixAreaSplitter->addWidget(dataTable);
+    matrixAreaSplitter->addWidget(dataTable2);
+
+    dataTable->verticalHeader()->hide();
+    dataTable2->verticalHeader()->hide();
+    dataTable->hideColumn(0);
+    dataTable2->hideColumn(0);
+    taxonColumn->setMaximumWidth(taxonColumn->columnWidth(0));
+
+    taxonColumn->setStyleSheet(styleSheet);
+    dataTable->setStyleSheet(styleSheet);
+    dataTable2->setStyleSheet(styleSheet);
 }
 
 void MainWindow::initDataTableDisplay()
@@ -516,8 +537,24 @@ void MainWindow::initDataTableDisplay()
 
 void MainWindow::launchTableDisplay()
 {
-    createMainWindow();
+    initDataTableDisplay();
+    setButtonsDisabled(false);
     showMaximized();
+}
+
+void MainWindow::closeDisplay()
+{
+
+    delete dataModel;
+    dataModel = nullptr;
+    delete dataTable;
+    dataTable = nullptr;
+    delete dataTable2;
+    dataTable2 = nullptr;
+    delete taxonColumn;
+    taxonColumn = nullptr;
+
+    setButtonsDisabled(true);
 }
 
 void MainWindow::showMessage(QString message)

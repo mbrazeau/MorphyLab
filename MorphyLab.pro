@@ -9,6 +9,8 @@ CONFIG += qt \
     release \
     warn_on
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
+
 SOURCES += \
     CellData.cpp \
     MainLayout.cpp \
