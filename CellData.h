@@ -4,6 +4,9 @@
 #include <vector>
 #include <utility>
 #include <string>
+//RJG - added to compile on Linux
+#include <cassert>
+#include <algorithm>
 
 #include "abstractphydata.h"
 
