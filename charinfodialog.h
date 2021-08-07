@@ -4,17 +4,19 @@
 #include <QDialog>
 #include <QObject>
 #include <QLayout>
+#include <QLabel>
 
-
-
-class ToolButton;
+class CharInfoWidget;
+class CharData;
 class CharInfoDialog : public QDialog
 {
 public:
-   explicit CharInfoDialog(QWidget *parent = nullptr);
+   explicit CharInfoDialog(CharData &cd, QWidget *parent = nullptr);
 
 private:
-    ToolButton *tb;
+
+    QVBoxLayout *m_layout;
+    CharInfoWidget *m_charInfoWidget;
 };
 
 #endif // CHARINFODIALOG_H

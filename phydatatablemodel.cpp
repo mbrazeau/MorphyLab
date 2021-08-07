@@ -175,6 +175,44 @@ bool PhyDataTableModel::insertColumns(int position, int cols, const QModelIndex 
     return true;
 }
 
+bool PhyDataTableModel::removeColumns(int position, int cols, const QModelIndex &index)
+{
+    beginRemoveColumns(QModelIndex(), position, position+cols-1);
+
+    if (position == 0) {
+        return false;
+    }
+
+    m_headerData.remove(position-1, 1);
+    for (int i = 0; i < rowCount(); ++i) {
+        CellData* cd = (CellData*)m_dataMatrix[i][position];
+        delete cd;
+        m_dataMatrix[i].remove(position);
+    }
+
+    endRemoveColumns();
+    return true;
+}
+
+bool PhyDataTableModel::removeRows(int position, int rows, const QModelIndex &index)
+{
+    beginRemoveRows(QModelIndex(), position, position+rows-1);
+
+    // Remove the rows
+
+    TaxonData* td =  (TaxonData*)m_dataMatrix[position][0];
+    delete td;
+    for (int i = 1; i < columnCount(); ++i) {
+        CellData* cd = (CellData*)m_dataMatrix[position][i];
+        delete cd;
+    }
+
+    m_dataMatrix.remove(position, 1); // NOTE: This and the above need iteration for myltiple rows
+
+    endRemoveRows();
+    return true;
+}
+
 QVariant PhyDataTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)

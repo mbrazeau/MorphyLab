@@ -1,25 +1,28 @@
-#include <QTextEdit>
-#include <QTableWidget>
-
 #include "charinfodialog.h"
+#include <QDialogButtonBox>
+
+#include "charinfowidget.h"
 #include "toolbutton.h"
 
 #include <iostream>
 
-CharInfoDialog::CharInfoDialog(QWidget *parent) : QDialog(parent)
+CharInfoDialog::CharInfoDialog(CharData &cd, QWidget *parent) : QDialog(parent)
 {
-    setMinimumSize(900, 300);
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
+    setWindowTitle(tr("Edit character"));
 
+    m_layout = new QVBoxLayout;
 
-    QTextEdit *descript = new QTextEdit;
+    m_charInfoWidget = new CharInfoWidget(cd, this);
 
-    layout->addWidget(descript);
+    // Add a button box at the bottom
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
+    buttonBox->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox:: Ok);
 
-    QTableWidget *states = new QTableWidget;
-    states->setMaximumWidth(300);
-    layout->addWidget(states);
+    m_layout->addWidget(m_charInfoWidget);
+    m_layout->addWidget(buttonBox);
 
-    setWindowTitle(tr("A dialog"));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    setLayout(m_layout);
 }

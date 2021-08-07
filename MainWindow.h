@@ -18,13 +18,15 @@ class ToolButton;
 class QTableView;
 class MorphyLabNexusReader;
 class MainLayout;
+class TaxonColumn;
+class DataTable;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
 
 private:
 
@@ -34,7 +36,10 @@ private:
     void createToolButtons();
 
     void addCharacters();
+    void deleteCharacters();
     void addTaxa();
+    void deleteTaxa();
+    void doDeletion();
 
     void createTableViews();
     void fileOpen();
@@ -45,6 +50,7 @@ private:
     void fileClose();
     void aboutMenu();
 
+    void openCharEditDialog();
     void createDataTables();
     void initDataTableDisplay();
     void launchTableDisplay();
@@ -69,9 +75,9 @@ private:
     CharInfoDialog *cd;
 
     PhyDataTableModel *dataModel;
-    QTableView *dataTable;
-    QTableView *dataTable2;
-    QTableView *taxonColumn;
+    DataTable *dataTable;
+    DataTable *dataTable2;
+    TaxonColumn *taxonColumn;
     QStringList tableHeader;
 
     MorphyLabNexusReader    *reader;

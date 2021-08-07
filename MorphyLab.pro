@@ -6,7 +6,7 @@ QT = core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += qt \
-    release \
+ #   release \
     warn_on
 
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
@@ -20,9 +20,13 @@ SOURCES += \
     abstractphydata.cpp \
     chardata.cpp \
     charinfodialog.cpp \
+    charinfowidget.cpp \
+    datatable.cpp \
     main.cpp \
     phydatatablemodel.cpp \
     statedata.cpp \
+    stateinfowidget.cpp \
+    taxoncolumn.cpp \
     taxondata.cpp \
     toolbutton.cpp
 
@@ -35,8 +39,12 @@ HEADERS += \
     abstractphydata.h \
     chardata.h \
     charinfodialog.h \
+    charinfowidget.h \
+    datatable.h \
     phydatatablemodel.h \
     statedata.h \
+    stateinfowidget.h \
+    taxoncolumn.h \
     taxondata.h \
     toolbutton.h
 

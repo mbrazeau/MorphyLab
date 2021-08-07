@@ -20,8 +20,11 @@
 #include "toolbutton.h"
 #include "phydatatablemodel.h"
 #include "charinfodialog.h"
+#include "taxoncolumn.h"
+#include "datatable.h"
+#include "charinfodialog.h"
 
-MainWindow::MainWindow() : QMainWindow()
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     // Initialise variables:
     mainLayout = nullptr;
@@ -98,6 +101,8 @@ void MainWindow::createMenus()
     charsMenu->addAction(addCharsAction);
     QAction *editCharInfo = new QAction(tr("&Edit character..."), this);
     charsMenu->addAction(editCharInfo);
+    connect(editCharInfo, &QAction::triggered, this, &MainWindow::openCharEditDialog); // <<
+
     charsMenu->addSeparator();
     QAction *mergeChars = new QAction(tr("&Merge characters"), this);
     charsMenu->addAction(mergeChars);
@@ -162,7 +167,7 @@ void MainWindow::createToolButtons()
     bNewTax->setToolTip("Add taxa");
 
     taxonButtonLayout->addWidget(bDelete);
-//    connect(bNewTax, &QPushButton::clicked, this, &MainWindow::doDeletion);
+    connect(bDelete, &QPushButton::clicked, this, &MainWindow::doDeletion);
     bDelete->setIcon(QIcon(":/resources/icons/delete.png"));
     bDelete->setToolTip("Delete selection");
 
@@ -188,6 +193,22 @@ void MainWindow::addCharacters()
     initDataTableDisplay();
 }
 
+void MainWindow::deleteCharacters()
+{
+    QModelIndexList indexes = dataTable->selectionModel()->selectedIndexes();
+
+    // TODO: can iterate this over the indices for deleting non-consecutive selections
+    QModelIndex index = indexes[0];
+
+    int column = index.column();
+
+    if (column == 0) { // Never delete the taxon column
+        return;
+    }
+
+    dataModel->removeColumns(column, 1);
+}
+
 void MainWindow::addTaxa()
 {
     bool ok = true;
@@ -199,6 +220,41 @@ void MainWindow::addTaxa()
     assert(dataModel->rowCount() != 0);
     dataModel->insertRows(dataModel->rowCount(), newtaxa);  // TODO: REPLACE WITH AN NCHAR GETTER!!!
     initDataTableDisplay();
+}
+
+void MainWindow::deleteTaxa()
+{
+    if (dataModel->rowCount() == 1) {
+        showMessage(tr("Error: Cannot have less than 1 taxon in an open data file"));
+        return;
+    }
+
+    QModelIndexList indexes = dataTable->selectionModel()->selectedIndexes();
+
+    // TODO: can iterate this over the indices for deleting non-consecutive selections
+    QModelIndex index = indexes[0];
+
+    int row = index.row();
+
+    dataModel->removeRows(row, 1);
+}
+
+void MainWindow::doDeletion()
+{
+    QModelIndexList indexes = dataTable->selectionModel()->selectedIndexes();
+
+    // TODO: can iterate this over the indices for deleting non-consecutive selections
+//    QModelIndex index = indexes[0];
+
+    if (indexes.size() < 1) {
+        return;
+    }
+
+    if (dataTable->selectionModel()->isRowSelected(indexes[0].row())) {
+        deleteTaxa();
+    } else if (dataTable->selectionModel()->isColumnSelected(indexes[0].column())) {
+        deleteCharacters();
+    }
 }
 
 
@@ -309,7 +365,10 @@ void MainWindow::save()
     out << QString("    FORMAT DATATYPE=%1 ").arg("STANDARD"); // TODO: Obviously can accommodate more datatypes.
     out << QString("GAP=%1 ").arg("-");
     out << QString("MISSING=%1 ").arg("?");
-    out << QString("SYMBOLS=%1").arg("\"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\""); // TODO: Replace this with a getter for the symbols
+
+    QString symbolsstr = "\"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"";
+
+    out << QString("SYMBOLS=%1").arg(symbolsstr); // TODO: Replace this with a getter for the symbols
     out << QString(";");
     // Loop out the symbols
 
@@ -333,7 +392,7 @@ void MainWindow::save()
 void MainWindow::fileNew()
 {
     if (dataModel) {
-        showMessage(tr("A ddataset is already open. To open another one, save and close the current file"));
+        showMessage(tr("A dataset is already open. To open another one, save and close the current file"));
         return;
     }
 
@@ -422,14 +481,29 @@ void MainWindow::aboutMenu()
     showMessage(about);
 }
 
+void MainWindow::openCharEditDialog()
+{
+    QModelIndexList indexes = dataTable->selectionModel()->selectedIndexes();
+
+    QModelIndex index = indexes[0];
+
+    int column = index.column();
+
+    CharData cd;
+
+    CharInfoDialog charDialog(cd, this);
+
+    charDialog.exec();
+}
+
 void MainWindow::createDataTables()
 {
     // Create the tables: one for taxa only and one for matrix cells
     dataModel = new PhyDataTableModel(this);
 
-    dataTable = new QTableView(this);
-    dataTable2 = new QTableView(this);
-    taxonColumn = new QTableView(this);
+    dataTable = new DataTable(this);
+    dataTable2 = new DataTable(this);
+    taxonColumn = new TaxonColumn(this);
 
     dataTable->setModel(dataModel);
     dataTable2->setModel(dataModel);
@@ -458,12 +532,12 @@ void MainWindow::createDataTables()
     QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentRowChanged,
                          [this](const QModelIndex &current, const QModelIndex & previous)
         {
-            if(previous.isValid()) {
+//            if(previous.isValid()) {
                 dataTable->clearSelection();
                 dataTable2->clearSelection();
                 dataTable->selectRow(current.row());
                 dataTable2->selectRow(current.row());
-            }
+//            }
         });
     QObject::connect(dataTable->selectionModel(), &QItemSelectionModel::currentColumnChanged,
                          [this](const QModelIndex &current, const QModelIndex & previous)
@@ -510,7 +584,7 @@ void MainWindow::createDataTables()
     dataTable2->verticalHeader()->hide();
     dataTable->hideColumn(0);
     dataTable2->hideColumn(0);
-    taxonColumn->setMaximumWidth(taxonColumn->columnWidth(0));
+//    taxonColumn->setMaximumWidth(taxonColumn->columnWidth(0));
 
     taxonColumn->setStyleSheet(styleSheet);
     dataTable->setStyleSheet(styleSheet);
@@ -527,12 +601,16 @@ void MainWindow::initDataTableDisplay()
     }
 
     taxonColumn->resizeColumnToContents(0);
-    taxonColumn->setMaximumWidth(taxonColumn->columnWidth(0) + taxonColumn->verticalHeader()->width());
+
     dataTable->hideColumn(0);
     dataTable2->hideColumn(0);
-    matrixAreaSplitter->setSizes(QList<int>() << taxonColumn->columnWidth(0) + taxonColumn->verticalHeader()->width() + taxonColumn->verticalScrollBar()->width()
-                                 << dataTable->width()
-                                 << 0);
+    matrixAreaSplitter->setSizes(QList<int>() << taxonColumn->columnWidth(0) + taxonColumn->verticalHeader()->width()
+//                                                + taxonColumn->verticalScrollBar()->width()
+                                              << dataTable->width() + dataTable->verticalScrollBar()->width()
+                                              << 0);
+
+    taxonColumn->setColumnWidth(0, matrixAreaSplitter->handle(1)->pos().x());
+    connect(matrixAreaSplitter, &QSplitter::splitterMoved, taxonColumn, &TaxonColumn::moveTaxColumnDivider);
 }
 
 void MainWindow::launchTableDisplay()
