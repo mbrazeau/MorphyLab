@@ -6,7 +6,6 @@ QT = core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += qt \
- #   release \
     warn_on
 
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
