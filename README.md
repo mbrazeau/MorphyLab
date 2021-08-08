@@ -8,7 +8,7 @@ To build MorphyLab, glone the git repository. Then run the `getdeps.py` python s
 
 Then do
 
-`python getdeps.py init`
+`python getdeps.py build`
 
 If you'd like to make sure the dependencies are all up to date, you can run
 
