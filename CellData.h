@@ -8,6 +8,7 @@
 #include "abstractphydata.h"
 
 class StateData;
+class CharData;
 
 class CellData : public AbstractPhyData
 {
@@ -19,6 +20,7 @@ public:
                   };
 
     CellData();
+    CellData(CharData &charData);
     ~CellData(){}
 
     bool         labelInputMode();
@@ -38,11 +40,13 @@ public:
 
 private:
 
-    char m_wildCardToken;
-    bool m_labelInputMode;
-    std::string m_displayText;
-    PolyType m_polyType;
-    std::vector<std::pair<char, StateData>*> m_pState;
+    CharData                       *m_charData;
+    char                            m_wildCardToken;
+    bool                            m_labelInputMode;
+    std::string                     m_displayText;
+    PolyType                        m_polyType;
+    std::vector
+    <std::pair<char, StateData>*>   m_pState;
 
     bool checkValid(char c);
 };

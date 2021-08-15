@@ -523,55 +523,16 @@ void MainWindow::createDataTables()
     connect(taxonColumn->verticalScrollBar(), &QAbstractSlider::valueChanged,
             dataTable->verticalScrollBar(), &QAbstractSlider::setValue);
 
-    // TODO: This is working poorly and needs fixing
+
     // This part controls the propagation of selections from one table to all others
-    /*
-     * Review QItemSelectionModel Class
-     * Review QTableView::setSelectionModel
-    */
-    QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentRowChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-//            if(previous.isValid()) {
-                dataTable->clearSelection();
-                dataTable2->clearSelection();
-                dataTable->selectRow(current.row());
-                dataTable2->selectRow(current.row());
-//            }
-        });
-    QObject::connect(dataTable->selectionModel(), &QItemSelectionModel::currentColumnChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                taxonColumn->clearSelection();
-                dataTable2->clearSelection();
-                dataTable2->selectColumn(current.column());
-            }
-        });
+    taxonColumn->setSelectionModel(dataTable->selectionModel());
+    dataTable2->setSelectionModel(dataTable->selectionModel());
 
-    QObject::connect(dataTable2->selectionModel(), &QItemSelectionModel::currentColumnChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                dataTable->clearSelection();
-                taxonColumn->clearSelection();
-                dataTable->selectColumn(current.column());
-            }
-        });
-
-    QObject::connect(taxonColumn->selectionModel(), &QItemSelectionModel::currentColumnChanged,
-                         [this](const QModelIndex &current, const QModelIndex & previous)
-        {
-            if(previous.isValid()) {
-                dataTable->clearSelection();
-                dataTable2->clearSelection();
-            }
-        });
-
+    // Set up moveable header items
+    // TODO: Make this drag/drop enabled
     dataTable->horizontalHeader()->setSectionsMovable(true);
     dataTable->horizontalHeader()->setDragEnabled(true);
     dataTable->setDragDropMode(QAbstractItemView::InternalMove);
-
     taxonColumn->verticalHeader()->setSectionsMovable(true);
     taxonColumn->verticalHeader()->setDragEnabled(true);
     taxonColumn->setDragDropMode(QAbstractItemView::InternalMove);
@@ -584,7 +545,6 @@ void MainWindow::createDataTables()
     dataTable2->verticalHeader()->hide();
     dataTable->hideColumn(0);
     dataTable2->hideColumn(0);
-//    taxonColumn->setMaximumWidth(taxonColumn->columnWidth(0));
 
     taxonColumn->setStyleSheet(styleSheet);
     dataTable->setStyleSheet(styleSheet);

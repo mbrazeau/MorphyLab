@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QLayout>
 #include <QLabel>
+#include <QListView>
 
 class CharInfoWidget;
 class CharData;
@@ -15,8 +16,9 @@ public:
 
 private:
 
-    QVBoxLayout *m_layout;
-    CharInfoWidget *m_charInfoWidget;
+    QGridLayout     *m_layout;
+    QListView       *m_charListView;
+    CharInfoWidget  *m_charInfoWidget;
 };
 
 #endif // CHARINFODIALOG_H

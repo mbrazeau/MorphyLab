@@ -19,7 +19,7 @@ public:
     void         describeChar(std::string charDescript);
     void         addState(char token, std::string stateName);
     char         getStateToken(std::string stateName);
-    std::string &getStateName(char token);
+    std::string  getStateName(char token);
     bool         isIncluded();
     void         include(bool inclusion);
 
