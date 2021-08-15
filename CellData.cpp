@@ -1,6 +1,9 @@
+#include <algorithm>
+#include <cassert>
 #include <set>
 
 #include "CellData.h"
+#include "chardata.h"
 #include "statedata.h"
 
 CellData::CellData() : AbstractPhyData()
@@ -8,6 +11,13 @@ CellData::CellData() : AbstractPhyData()
     m_wildCardToken = '?';
     m_displayText.clear();
     m_displayText.push_back(m_wildCardToken);
+
+}
+
+CellData::CellData(CharData &charData) : AbstractPhyData()
+{
+//    CellData();
+    m_charData = &charData;
 }
 
 std::string CellData::displayText() const
