@@ -1,6 +1,6 @@
 # MorphyLab
 
-MorphyLab is a free prototype for a discrete character matrix editor. 
+MorphyLab is a free prototype for a discrete character matrix editor. It is written in C++ using the Qt framework.
 
 To build MorphyLab, glone the git repository. Then run the `getdeps.py` python script as follows to clone and build all the dependencies.
 
