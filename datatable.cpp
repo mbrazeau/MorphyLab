@@ -1,4 +1,6 @@
 #include <QMenu>
+#include <QScrollBar>
+#include <QScrollArea>
 
 #include "datatable.h"
 #include "charinfodialog.h"
@@ -6,9 +8,17 @@
 DataTable::DataTable(QWidget *parent) : QTableView(parent)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(contextMenuEvent(QContextMenuEvent *)));
 }
+
+//QSize DataTable::sizeHint() const
+//{
+//    QSize newSize = QTableView::sizeHint();
+
+//    newSize.setWidth(newSize.width() + verticalScrollBar()->width());
+//    newSize.setHeight(newSize.height() + horizontalScrollBar()->width());
+
+//    return newSize;
+//}
 
 void DataTable::contextMenuEvent(QContextMenuEvent *event)
 {

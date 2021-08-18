@@ -6,11 +6,13 @@
 
 class DataTable : public QTableView
 {
+    Q_OBJECT
 public:
     explicit DataTable(QWidget *parent = nullptr);
+//    QSize sizeHint() const override;
 
 public slots:
-    void contextMenuEvent(QContextMenuEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event) override;
 };
 
 #endif // DATATABLE_H

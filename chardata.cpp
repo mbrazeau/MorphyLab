@@ -9,3 +9,4 @@ std::string CharData::displayText() const
 {
     return m_Description;
 }
+

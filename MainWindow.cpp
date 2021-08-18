@@ -84,7 +84,6 @@ void MainWindow::createMenus()
     fileMenu->addAction(exportAct);
     connect(exportAct, &QAction::triggered, this, &MainWindow::fileExport);
 
-
     // Edit menu
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     QAction *copyAction = new QAction(tr("&Copy"), this);
@@ -261,7 +260,7 @@ void MainWindow::doDeletion()
 void MainWindow::createTableViews()
 {
     matrixAreaSplitter = new QSplitter;
-    scrollArea = new QScrollArea;
+//    scrollArea = new QScrollArea;
 
     matrixAreaSplitter->setHandleWidth(1);
 
@@ -473,9 +472,10 @@ void MainWindow::aboutMenu()
     "MorphyLab version 0.2 alpha\n"
     "written by Martin D. Brazeau."
     "\n\n"
-    "This program uses the Nexus Class Library by Mark Holder and Paul O. Lewis.\n\n"
+    "This program is written using the Qt Framework and is distributed as free, open source software.\n"
+    "Nexus importing uses the Nexus Class Library by Mark Holder and Paul O. Lewis.\n\n"
     "Thanks:\n"
-    "Joe Keating, Sam Giles, and Luke Parry for being early testers."
+    "Joe Keating, Russell Garwood, Luke Parry, and Sam Giles for being early testers."
     ;
 
     showMessage(about);
@@ -514,6 +514,7 @@ void MainWindow::createDataTables()
     dataTable2->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
     dataTable2->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
     taxonColumn->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
+    taxonColumn->setHorizontalScrollMode(QAbstractItemView::ScrollPerItem);
 
     // C'nect the scroll bars.
     connect(dataTable->verticalScrollBar(), &QAbstractSlider::valueChanged,
@@ -533,8 +534,8 @@ void MainWindow::createDataTables()
     dataTable->horizontalHeader()->setSectionsMovable(true);
     dataTable->horizontalHeader()->setDragEnabled(true);
     dataTable->setDragDropMode(QAbstractItemView::InternalMove);
-    taxonColumn->verticalHeader()->setSectionsMovable(true);
-    taxonColumn->verticalHeader()->setDragEnabled(true);
+//    taxonColumn->verticalHeader()->setSectionsMovable(true);
+//    taxonColumn->verticalHeader()->setDragEnabled(true);
     taxonColumn->setDragDropMode(QAbstractItemView::InternalMove);
 
     matrixAreaSplitter->addWidget(taxonColumn);

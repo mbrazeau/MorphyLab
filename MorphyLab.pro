@@ -17,6 +17,7 @@ SOURCES += \
     MorphyLabNexusReader.cpp \
     StateDataTable.cpp \
     abstractphydata.cpp \
+    characterlistmodel.cpp \
     chardata.cpp \
     charinfodialog.cpp \
     charinfowidget.cpp \
@@ -36,6 +37,7 @@ HEADERS += \
     MorphyLabNexusReader.h \
     StateDataTable.h \
     abstractphydata.h \
+    characterlistmodel.h \
     chardata.h \
     charinfodialog.h \
     charinfowidget.h \

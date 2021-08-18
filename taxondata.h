@@ -6,7 +6,6 @@
 #include "abstractphydata.h"
 
 class TaxonData : public AbstractPhyData
-
 {
 public:
     TaxonData();

@@ -1,8 +1,20 @@
+#include <QScrollBar>
+#include <QScrollArea>
+
 #include "taxoncolumn.h"
 
 TaxonColumn::TaxonColumn(QWidget *parent) : QTableView(parent)
 {
+}
 
+QSize TaxonColumn::sizeHint() const
+{
+    QSize newSize = QTableView::sizeHint();
+
+    newSize.setWidth(newSize.width() + verticalScrollBar()->width());
+    newSize.setHeight(newSize.height() + horizontalScrollBar()->width());
+
+    return newSize;
 }
 
 void TaxonColumn::moveTaxColumnDivider(int pos, int index)
