@@ -249,9 +249,9 @@ void MainWindow::doDeletion()
         return;
     }
 
-    if (dataTable->selectionModel()->isRowSelected(indexes[0].row())) {
+    if (dataTable->selectionModel()->isRowSelected(indexes[0].row(), QModelIndex())) {
         deleteTaxa();
-    } else if (dataTable->selectionModel()->isColumnSelected(indexes[0].column())) {
+    } else if (dataTable->selectionModel()->isColumnSelected(indexes[0].column(), QModelIndex())) {
         deleteCharacters();
     }
 }
